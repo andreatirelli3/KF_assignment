@@ -7,7 +7,7 @@
 int main(int argc, char *argv[])
 {
     int64_t freq = 100;            // Frequency of the thread dedicated to process the point cloud
-    std::string log_path = "log";  // TODO: define the path to the log folder
+    std::string log_path = "/Users/andreatirelli/Developments/platforms_algorithms/assignment/KF_assignment/log";  // TODO: define the path to the log folder
 
     std::ifstream dataFile(log_path, std::ios::in | std::ios::binary);
     if (!dataFile)
