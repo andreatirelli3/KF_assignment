@@ -1,0 +1,120 @@
+# Point cloud folder
+log/
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries (shared object files)
+*.so
+*.dylib
+*.dll
+
+# Executables
+*.exe
+*.out
+*.app
+
+# CMake build directory
+CMakeFiles/
+CMakeCache.txt
+CMakeScripts/
+Testing/
+build/
+cmake_install.cmake
+Makefile
+
+# Visual Studio Code settings
+.vscode/
+
+# Compiled C++ binary
+/bin/
+
+# CMake-generated files
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Testing/
+
+# Mac specific files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux specific files
+lost+found/
+
+# Windows specific files
+Thumbs.db
+ehthumbs.db
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Debug information files
+*.pdb
+
+# Backup files
+*~
+*.bak
+*.backup
+*.swp
+
+# Visual Studio Code workspace settings
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+.vscode/extensions.json
+
+# Visual Studio Code local settings
+.vscode/localsettings.json
+
+# CMake User-specific files
+CMakeUserPresets.json
+CMakePresets.json
+
+# Compiled Python files
+__pycache__/
+
+# Compiled Ruby files
+*.gem
+*.rbc
+*.rbo
+*.rbs
+*.gemspec
+
+# Compiled Java files
+*.class
+
+# Compiled C# files
+*.dll
+*.exe
+*.pdb
+
+# Node.js files
+node_modules/
+package-lock.json
+
+# Yarn files
+yarn.lock
+
+# macOS directory settings
+.DS_Store
+
+# Ubuntu local settings
+.local/
+
+# Windows installer files
+setup.log
+install.log
+msi.log
