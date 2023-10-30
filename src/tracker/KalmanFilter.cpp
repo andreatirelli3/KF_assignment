@@ -61,6 +61,8 @@ void KalmanFilter::predict()
   // Implement Kalman Filter Predict
   //  x_ = ...
   //  P_ = ...
+  x_ = F_ * x_;
+  P_ = F_ * P_ * F_.transpose();
 }
 
 void KalmanFilter::update(const Eigen::VectorXd &z)
@@ -71,11 +73,17 @@ void KalmanFilter::update(const Eigen::VectorXd &z)
   // Eigen::VectorXd y = ...
   // Eigen::MatrixXd S = ...
   // Eigen::MatrixXd K = ...
+  Eigen::VectorXd y = Eigen::VectorXd(z - (H_ * x_));
+  Eigen::MatrixXd S = Eigen::MatrixXd(H_ * P_ * H_.transpose() + R_);
+  Eigen::MatrixXd K = Eigen::MatrixXd(P_ * H_.transpose() * S.inverse());
 
   // new estimate
   // x_ = ...
   // Eigen::MatrixXd I = Eigen::MatrixXd::Identity(x_.size(), x_.size());
   // P_ = ...
+  x_ = x_ + (K * y);
+  Eigen::MatrixXd I = Eigen::MatrixXd::Identity(x_.size(), x_.size());
+  P_ = (I - (K * H_)) * P_;
 }
 
 void KalmanFilter::setState(double x, double y)
