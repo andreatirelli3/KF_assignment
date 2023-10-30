@@ -1,6 +1,12 @@
 #include "CloudManager.h"
 using namespace std;
 
+/*
+CMake 17
+*/
+#include <filesystem>
+namespace fs = std::filesystem;
+
 CloudManager::CloudManager(const std::string &path, int64_t freq, viewer::Renderer &renderer)
 {
     path_ = path;
@@ -145,8 +151,15 @@ void CloudManager::startCloudManager()
 {
 
     pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud(new pcl::PointCloud<pcl::PointXYZ>);
-    std::vector<boost::filesystem::path> stream(boost::filesystem::directory_iterator{path_},
-                                                boost::filesystem::directory_iterator{});
+    // CMake 13
+    // std::vector<boost::filesystem::path> stream(boost::filesystem::directory_iterator{path_},
+    //                                             boost::filesystem::directory_iterator{});
+
+    // CMake 17
+    vector<fs::path> stream;
+    for (const auto& entry : fs::directory_iterator(path_)) {
+        stream.push_back(entry.path());
+    }
 
     // sort files in ascending (chronological) order
     std::sort(stream.begin(), stream.end());
