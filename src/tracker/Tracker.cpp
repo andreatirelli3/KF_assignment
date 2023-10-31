@@ -72,9 +72,14 @@ void Tracker::dataAssociation(std::vector<bool> &associated_detections, const st
 
         for (size_t j = 0; j < associated_detections.size(); ++j)
         {
-            // TODO
-            // Implement logic to find the closest detection (centroids_x,centroids_y) 
+            // TODO:
+            //
+            // - Implement logic to find the closest detection (centroids_x,centroids_y) 
             // to the current track (tracks_)
+            //
+            // + Mahalaobis Distance
+            // 
+            // + args to switch between ED e MD
             double distance = euclideanDistance(tracks_[i], centroids_x[j], centroids_y[j]);
             if (distance < min_dist) 
                 min_dist = distance;
