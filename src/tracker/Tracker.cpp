@@ -1,5 +1,7 @@
 #include "tracker/Tracker.h"
 
+#include <cmath>
+
 Tracker::Tracker()
 {
     cur_id_ = 0;
@@ -42,6 +44,14 @@ void Tracker::addTracks(const std::vector<bool> &associated_detections, const st
             tracks_.push_back(Tracklet(cur_id_++, centroids_x[i], centroids_y[i]));
 }
 
+double euclideanDistance(Tracklet &track, double x, double y) {
+    double x_diff = track.getX() - x;
+    double y_diff = track.getY() - y;
+    double squared_distance = x_diff * x_diff + y_diff * y_diff;
+    double distance = sqrt(squared_distance);
+    return distance;
+}
+
 /*
     This function associates detections (centroids_x,centroids_y) with the tracks (tracks_)
     Input:
@@ -64,7 +74,10 @@ void Tracker::dataAssociation(std::vector<bool> &associated_detections, const st
         {
             // TODO
             // Implement logic to find the closest detection (centroids_x,centroids_y) 
-            // to the current track (tracks_) 
+            // to the current track (tracks_)
+            double distance = euclideanDistance(tracks_[i], centroids_x[j], centroids_y[j]);
+            if (distance < min_dist) 
+                min_dist = distance;
             
         }
 
@@ -86,8 +99,11 @@ void Tracker::track(const std::vector<double> &centroids_x,
 
     // TODO: Predict the position
     //For each track --> Predict the position of the tracklets
+    for (auto &track : tracks_)
+        track.predict();
     
     // TODO: Associate the predictions with the detections
+    dataAssociation(associated_detections, centroids_x, centroids_y);
 
     // Update tracklets with the new detections
     for (int i = 0; i < associated_track_det_ids_.size(); ++i)
