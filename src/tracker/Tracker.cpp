@@ -18,17 +18,25 @@ Tracker::~Tracker()
 */
 void Tracker::removeTracks()
 {
+    // Debug flag to keep all tracklet and ignore the logic.
+    bool logic_to_keep = true;
+
+    // Vector of `Tracklet` to keep in the scene.
+    // At the end of the logic this struct will be reversed
+    // (because of `push_back()` method) into the `tracks_` vector.
     std::vector<Tracklet> tracks_to_keep;
 
-    for (size_t i = 0; i < tracks_.size(); ++i)
-    {
-        // TODO
-        // Implement logic to discard old tracklets
-        // logic_to_keep is a dummy placeholder to make the code compile and should be subsituted with the real condition
-        bool logic_to_keep = true;
-        if (logic_to_keep)
-            tracks_to_keep.push_back(tracks_[i]);
-    }
+    // for (size_t i = 0; i < tracks_.size(); ++i)
+    // {
+    //     // TODO
+    //     // Implement logic to discard old tracklets
+    //     // logic_to_keep is a dummy placeholder to make the code compile and should be subsituted with the real condition
+    //     bool logic_to_keep = true;
+    //     if (logic_to_keep)
+    //         tracks_to_keep.push_back(tracks_[i]);
+    // }
+
+    
 
     tracks_.swap(tracks_to_keep);
 }
@@ -58,10 +66,10 @@ double euclideanDistance(Tracklet &track, double x, double y) {
         associated_detection an empty vector to host the associated detection
         centroids_x & centroids_y measurements representing the detected objects
 */
-void Tracker::dataAssociation(std::vector<bool> &associated_detections, const std::vector<double> &centroids_x, const std::vector<double> &centroids_y)
-{
-
-    //Remind this vector contains a pair of tracks and its corresponding
+void Tracker::dataAssociation(std::vector<bool> &associated_detections,
+                            const std::vector<double> &centroids_x,
+                            const std::vector<double> &centroids_y) {
+    // Remind this vector contains a pair of tracks and its corresponding
     associated_track_det_ids_.clear();
 
     for (size_t i = 0; i < tracks_.size(); ++i)
@@ -97,8 +105,7 @@ void Tracker::dataAssociation(std::vector<bool> &associated_detections, const st
 
 void Tracker::track(const std::vector<double> &centroids_x,
                     const std::vector<double> &centroids_y,
-                    bool lidarStatus)
-{
+                    bool lidarStatus) {
 
     std::vector<bool> associated_detections(centroids_x.size(), false);
 
@@ -110,15 +117,17 @@ void Tracker::track(const std::vector<double> &centroids_x,
     // TODO: Associate the predictions with the detections
     dataAssociation(associated_detections, centroids_x, centroids_y);
 
+    // New version with foreach, to make it more readable!
+    //
     // Update tracklets with the new detections
-    for (int i = 0; i < associated_track_det_ids_.size(); ++i)
-    {
-        auto det_id = associated_track_det_ids_[i].first;
-        auto track_id = associated_track_det_ids_[i].second;
+    for (auto &associated_track : associated_track_det_ids_) {
+        auto det_id = associated_track.first;
+        auto track_id = associated_track.second;
         tracks_[track_id].update(centroids_x[det_id], centroids_y[det_id], lidarStatus);
     }
 
     // TODO: Remove dead tracklets
 
     // TODO: Add new tracklets
+    addTracks(associated_detections, centroids_x, centroids_y);
 }
