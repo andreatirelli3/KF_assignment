@@ -89,8 +89,11 @@ void Tracker::dataAssociation(std::vector<bool> &associated_detections,
             // 
             // + args to switch between ED e MD
             double distance = euclideanDistance(tracks_[i], centroids_x[j], centroids_y[j]);
-            if (distance < min_dist) 
+            if (distance < min_dist) {
                 min_dist = distance;
+                associated_detections[j] = true;
+            } 
+                
             
         }
 
