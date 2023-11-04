@@ -1,13 +1,14 @@
 #include "tracker/Tracker.h"
 
+#include <iostream>
 #include <cmath>
 
 Tracker::Tracker()
 {
     cur_id_ = 0;
-    distance_threshold_ = 0.0; // meters
+    distance_threshold_ = 1.0; // meters
     covariance_threshold = 0.0; 
-    loss_threshold = 0; //number of frames the track has not been seen
+    loss_threshold = 5; //number of frames the track has not been seen
 }
 Tracker::~Tracker()
 {
@@ -35,8 +36,12 @@ void Tracker::removeTracks()
     //     if (logic_to_keep)
     //         tracks_to_keep.push_back(tracks_[i]);
     // }
-
-    
+    for (auto &track : tracks_) {
+        // std::cout<<track.getId()<<std::endl;
+        if (track.getLossCount() < loss_threshold)
+            tracks_to_keep.push_back(track);
+    }
+        
 
     tracks_.swap(tracks_to_keep);
 }
@@ -72,6 +77,7 @@ void Tracker::dataAssociation(std::vector<bool> &associated_detections,
     // Remind this vector contains a pair of tracks and its corresponding
     associated_track_det_ids_.clear();
 
+    // std::cout<<tracks_.size()<<std::endl;
     for (size_t i = 0; i < tracks_.size(); ++i)
     {
 
@@ -89,17 +95,21 @@ void Tracker::dataAssociation(std::vector<bool> &associated_detections,
             // 
             // + args to switch between ED e MD
             double distance = euclideanDistance(tracks_[i], centroids_x[j], centroids_y[j]);
+
             if (distance < min_dist) {
+                closest_point_id = j;
                 min_dist = distance;
-                associated_detections[j] = true;
+                // associated_detections[j] = true;
             } 
                 
             
         }
-
+        std::cout<<"Min dist= "<<min_dist<<" - Threshold= "<<distance_threshold_<<std::endl;
+        std::cout<<"Index= "<<closest_point_id<<" - Detection= "<<associated_detections[closest_point_id]<<std::endl;
         // Associate the closest detection to a tracklet
         if (min_dist < distance_threshold_ && !associated_detections[closest_point_id])
         {
+            std::cout<<"Push in"<<std::endl;
             associated_track_det_ids_.push_back(std::make_pair(closest_point_id, i));
             associated_detections[closest_point_id] = true;
         }
@@ -123,13 +133,18 @@ void Tracker::track(const std::vector<double> &centroids_x,
     // New version with foreach, to make it more readable!
     //
     // Update tracklets with the new detections
+
+    std::cout<<"Associated_track_det_ids_size = "<<associated_track_det_ids_.size()<<std::endl;
     for (auto &associated_track : associated_track_det_ids_) {
         auto det_id = associated_track.first;
         auto track_id = associated_track.second;
+
+        std::cout<<det_id<<" - "<<track_id<<std::endl;
         tracks_[track_id].update(centroids_x[det_id], centroids_y[det_id], lidarStatus);
     }
 
     // TODO: Remove dead tracklets
+    removeTracks();
 
     // TODO: Add new tracklets
     addTracks(associated_detections, centroids_x, centroids_y);
