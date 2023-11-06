@@ -19,8 +19,8 @@ void KalmanFilter::init(double dt)
   P_ = Eigen::MatrixXd(4, 4);
   P_ << 1., 0., 0., 0.,
       0., 1., 0., 0.,
-      0., 0., 9999., 0.,
-      0., 0., 0., 9999.;
+      0., 0., 1., 0.,
+      0., 0., 0., 1.;
 
   // measurement covariance
   R_ = Eigen::MatrixXd(2, 2);
@@ -40,8 +40,8 @@ void KalmanFilter::init(double dt)
       0., 0., 0., 1.;
 
   // set the acceleration noise components
-  double noise_ax_ = 2.;
-  double noise_ay_ = 2.;
+  double noise_ax_ = 1.;
+  double noise_ay_ = 1.;
 
   double dt_2 = dt_ * dt_;
   double dt_3 = dt_2 * dt_;
