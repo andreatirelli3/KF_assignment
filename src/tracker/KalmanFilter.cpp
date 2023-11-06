@@ -55,34 +55,53 @@ void KalmanFilter::init(double dt)
       0., dt_3 / 2. * noise_ay_, 0., dt_2 * noise_ay_;
 }
 
+/**
+ * Predicts the state estimate for the next time step using the Kalman Filter's prediction step.
+ *
+ * This function predicts the state estimate for the next time step based on the current state estimate 'x_' and state covariance 'P_', using the Kalman Filter's prediction step.
+ *
+ * @remark This function assumes that the Kalman Filter has already been initialized with the state transition matrix 'F_' and has a valid state estimate 'x_' and state covariance 'P_'.
+ */
 void KalmanFilter::predict()
 {
-  // TODO
   // Implement Kalman Filter Predict
-  //  x_ = ...
-  //  P_ = ...
+
+  // Predict the state estimate 'x_'
   x_ = F_ * x_;
+
+  // Predict the state covariance 'P_'
   P_ = F_ * P_ * F_.transpose();
 }
 
+/**
+ * Updates the state estimate using the Kalman Filter.
+ *
+ * This function updates the state estimate based on the observed measurement vector 'z' using the Kalman Filter.
+ *
+ * @param z The observed measurement vector at the current time step.
+ *
+ * @remark This function assumes that the Kalman Filter has already been initialized with an initial state estimate 'x_', an initial state covariance 'P_', a measurement matrix 'H_', and a measurement noise covariance 'R_'.
+ */
 void KalmanFilter::update(const Eigen::VectorXd &z)
 {
-  // TODO
   // Implement Kalman Filter Update
 
-  // Eigen::VectorXd y = ...
-  // Eigen::MatrixXd S = ...
-  // Eigen::MatrixXd K = ...
+  // Calculate the innovation 'y' (measurement residual)
   Eigen::VectorXd y = Eigen::VectorXd(z - (H_ * x_));
+
+  // Calculate the innovation covariance 'S'
   Eigen::MatrixXd S = Eigen::MatrixXd(H_ * P_ * H_.transpose() + R_);
+
+  // Calculate the Kalman Gain 'K'
   Eigen::MatrixXd K = Eigen::MatrixXd(P_ * H_.transpose() * S.inverse());
 
-  // new estimate
-  // x_ = ...
-  // Eigen::MatrixXd I = Eigen::MatrixXd::Identity(x_.size(), x_.size());
-  // P_ = ...
+  // Update the state estimate 'x_'
   x_ = x_ + (K * y);
+
+  // Identity matrix for size adjustment
   Eigen::MatrixXd I = Eigen::MatrixXd::Identity(x_.size(), x_.size());
+
+  // Update the state covariance 'P_'
   P_ = (I - (K * H_)) * P_;
 }
 
