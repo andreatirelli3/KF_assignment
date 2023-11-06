@@ -32,7 +32,6 @@ int main(int argc, char *argv[])
     renderer.initCamera(viewer::CameraAngle::XY);
     renderer.clearViewer();
 
-    std::cout<<argv[1]<<std::endl;
     // Instantiate the tracker
     Tracker tracker;
     if (argv_length(argv) > 1 && (std::string(argv[1]) == "ED" || std::string(argv[1]) == "MD")) {
