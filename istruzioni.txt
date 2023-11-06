@@ -1,0 +1,35 @@
+Per eseguire in CMake13:
+src/CloudManager.cpp, rimuovere:
+    1) Riga 4
+        /*
+        CMake 17
+        */
+        #include <filesystem>
+        namespace fs = std::filesystem;
+    2) Riga 158
+        // CMake 17
+        vector<fs::path> stream;
+        for (const auto& entry : fs::directory_iterator(path_)) {
+            stream.push_back(entry.path());
+        }
+    3) Togliere i commenti nella riga 155
+    // CMake 13
+    // std::vector<boost::filesystem::path> stream(boost::filesystem::directory_iterator{path_},
+    //                                             boost::filesystem::directory_iterator{});
+
+*ovviamente cambiare il path della cartella log, come descritto nel README.md
+
+Per eseguire:
+cd build
+cmake ..
+make -j4
+
+poi in base al tipo di calcolo della distanza da eseguire
+- ./main oppure ./main ED => usa Euclidean Distance
+- ./main MD => usa Mahalanobis Distance, che però al momento della scrittura del file è buggato,
+se viene risolto sicuramente lo potrà vedere nei commit del progetto o dal corretto funzionamento della demo.
+
+Alcuni problemi e difficoltà riscontrati nello sviluppo della demo:
+- quando cluster si sovrappongono
+- movimento di un cluster ma nel tragitto perde alcune letture del sensore
+- cambio di traiettoria dell'oggetto
