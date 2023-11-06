@@ -3,13 +3,40 @@
 #include <iostream>
 #include <cmath>
 
+// Define the global var to switch between:
+//
+// - 'ED' = use `euclideanDistance`
+//
+// - 'MD' = use `mahalaobisDistance`
+std::string DISTANCE_TYPE_METHOD = "ED";
+
 Tracker::Tracker()
 {
     cur_id_ = 0;
-    distance_threshold_ = 1.0; // meters
-    covariance_threshold = 0.0; 
-    loss_threshold = 5; //number of frames the track has not been seen
+    distance_threshold_ = 0.5; // meters
+    covariance_threshold = 0.05; 
+    loss_threshold = 10; //number of frames the track has not been seen
+    DISTANCE_TYPE_METHOD = "ED";
+
+    std::cout<<"Using default method euclideanDistance()"<<std::endl;
 }
+
+Tracker::Tracker(std::string distance_method)
+{
+    cur_id_ = 0;
+    distance_threshold_ = 0.5; // meters
+    covariance_threshold = 0.05; 
+    loss_threshold = 30; //number of frames the track has not been seen
+
+    if (distance_method == "MD") {
+        DISTANCE_TYPE_METHOD = distance_method;
+        std::cout<<"Using method mahalaobisDistance()"<<std::endl;
+    } else {
+        DISTANCE_TYPE_METHOD = "ED";
+        std::cout<<"Using method euclideanDistance()"<<std::endl;
+    }
+}
+
 Tracker::~Tracker()
 {
 }
@@ -19,29 +46,21 @@ Tracker::~Tracker()
 */
 void Tracker::removeTracks()
 {
-    // Debug flag to keep all tracklet and ignore the logic.
-    bool logic_to_keep = true;
-
     // Vector of `Tracklet` to keep in the scene.
     // At the end of the logic this struct will be reversed
     // (because of `push_back()` method) into the `tracks_` vector.
     std::vector<Tracklet> tracks_to_keep;
 
-    // for (size_t i = 0; i < tracks_.size(); ++i)
-    // {
-    //     // TODO
-    //     // Implement logic to discard old tracklets
-    //     // logic_to_keep is a dummy placeholder to make the code compile and should be subsituted with the real condition
-    //     bool logic_to_keep = true;
-    //     if (logic_to_keep)
-    //         tracks_to_keep.push_back(tracks_[i]);
-    // }
     for (auto &track : tracks_) {
-        // std::cout<<track.getId()<<std::endl;
-        if (track.getLossCount() < loss_threshold)
-            tracks_to_keep.push_back(track);
+        // std::cout<<"Tracklet = "<<track.getId()<<std::endl;
+        // std::cout<<"\tCovariance X = "<<track.getXCovariance()<<std::endl;
+        // std::cout<<"\tCovariance Y = "<<track.getYCovariance()<<std::endl;
+        // std::cout<<"\tFrame loss = "<<track.getLossCount()<<std::endl;
+        if (track.getXCovariance() < covariance_threshold && track.getYCovariance() < covariance_threshold) {
+            if (track.getLossCount() < loss_threshold)
+                tracks_to_keep.push_back(track);
+        }
     }
-        
 
     tracks_.swap(tracks_to_keep);
 }
@@ -86,30 +105,31 @@ void Tracker::dataAssociation(std::vector<bool> &associated_detections,
 
         for (size_t j = 0; j < associated_detections.size(); ++j)
         {
-            // TODO:
-            //
-            // - Implement logic to find the closest detection (centroids_x,centroids_y) 
+            // Logic to find the closest detection (centroids_x,centroids_y) 
             // to the current track (tracks_)
             //
-            // + Mahalaobis Distance
+            // - Mahalaobis Distance
             // 
-            // + args to switch between ED e MD
-            double distance = euclideanDistance(tracks_[i], centroids_x[j], centroids_y[j]);
+            // - Euclidean Distance
+            
+            double distance = 0.0;
+            // Switch between ED e MD
+            if (DISTANCE_TYPE_METHOD == "MD")
+                // Mahalaobis Distance
+            else
+                // Euclidean Distance
+                distance = euclideanDistance(tracks_[i], centroids_x[j], centroids_y[j]);
 
             if (distance < min_dist) {
                 closest_point_id = j;
                 min_dist = distance;
-                // associated_detections[j] = true;
-            } 
-                
-            
+            }            
         }
-        std::cout<<"Min dist= "<<min_dist<<" - Threshold= "<<distance_threshold_<<std::endl;
-        std::cout<<"Index= "<<closest_point_id<<" - Detection= "<<associated_detections[closest_point_id]<<std::endl;
+        
         // Associate the closest detection to a tracklet
         if (min_dist < distance_threshold_ && !associated_detections[closest_point_id])
         {
-            std::cout<<"Push in"<<std::endl;
+            // std::cout<<"Push in"<<std::endl;
             associated_track_det_ids_.push_back(std::make_pair(closest_point_id, i));
             associated_detections[closest_point_id] = true;
         }
@@ -128,18 +148,17 @@ void Tracker::track(const std::vector<double> &centroids_x,
         track.predict();
     
     // TODO: Associate the predictions with the detections
+    // std::cout<<centroids_x.size()<<std::endl;
     dataAssociation(associated_detections, centroids_x, centroids_y);
 
     // New version with foreach, to make it more readable!
     //
     // Update tracklets with the new detections
 
-    std::cout<<"Associated_track_det_ids_size = "<<associated_track_det_ids_.size()<<std::endl;
+    // std::cout<<"Associated_track_det_ids_size = "<<associated_track_det_ids_.size()<<std::endl;
     for (auto &associated_track : associated_track_det_ids_) {
         auto det_id = associated_track.first;
         auto track_id = associated_track.second;
-
-        std::cout<<det_id<<" - "<<track_id<<std::endl;
         tracks_[track_id].update(centroids_x[det_id], centroids_y[det_id], lidarStatus);
     }
 

@@ -1,8 +1,19 @@
 #include <fstream>
 
+#include <iostream>
+
 #include "viewer/Renderer.h"
 #include "tracker/Tracker.h"
 #include "CloudManager.h"
+
+size_t argv_length(char** argv)
+{
+    size_t ret = 0;
+    while( *(++argv) )
+        ret += strlen(*argv);
+
+    return ret;
+}
 
 int main(int argc, char *argv[])
 {
@@ -21,8 +32,13 @@ int main(int argc, char *argv[])
     renderer.initCamera(viewer::CameraAngle::XY);
     renderer.clearViewer();
 
+    std::cout<<argv[1]<<std::endl;
     // Instantiate the tracker
     Tracker tracker;
+    if (argv_length(argv) > 1 && (std::string(argv[1]) == "ED" || std::string(argv[1]) == "MD")) {
+        tracker = Tracker(argv[1]);
+    } 
+    
 
     // Spawn the thread that process the point cloud and performs the clustering
     CloudManager lidar_cloud(log_path, freq, renderer);

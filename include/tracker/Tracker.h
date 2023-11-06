@@ -9,6 +9,7 @@ class Tracker
 {
 public:
   Tracker();
+  Tracker(std::string distance_method);
   ~Tracker();
 
   // handle tracklets
@@ -28,6 +29,7 @@ public:
              bool lidarStatus);
 
   // getters
+  const std::string getDistanceMethod() { return DISTANCE_TYPE_METHOD; }
   const std::vector<Tracklet> &getTracks() { return tracks_; }
 
 private:
@@ -42,6 +44,9 @@ private:
   double distance_threshold_;
   double covariance_threshold;
   int loss_threshold;
+
+  // distance method
+  std::string DISTANCE_TYPE_METHOD;
 };
 
 #endif // TRACKER_H_
