@@ -58,9 +58,11 @@ void KalmanFilter::init(double dt)
 /**
  * Predicts the state estimate for the next time step using the Kalman Filter's prediction step.
  *
- * This function predicts the state estimate for the next time step based on the current state estimate 'x_' and state covariance 'P_', using the Kalman Filter's prediction step.
+ * This function predicts the state estimate for the next time step based on the current state estimate 'x_' and state covariance 'P_', 
+ * using the Kalman Filter's prediction step.
  *
- * @remark This function assumes that the Kalman Filter has already been initialized with the state transition matrix 'F_' and has a valid state estimate 'x_' and state covariance 'P_'.
+ * @remark This function assumes that the Kalman Filter has already been initialized with the state transition matrix 'F_' 
+ * and has a valid state estimate 'x_' and state covariance 'P_'.
  */
 void KalmanFilter::predict()
 {
@@ -80,7 +82,8 @@ void KalmanFilter::predict()
  *
  * @param z The observed measurement vector at the current time step.
  *
- * @remark This function assumes that the Kalman Filter has already been initialized with an initial state estimate 'x_', an initial state covariance 'P_', a measurement matrix 'H_', and a measurement noise covariance 'R_'.
+ * @remark This function assumes that the Kalman Filter has already been initialized with an initial state estimate 'x_', 
+ * an initial state covariance 'P_', a measurement matrix 'H_', and a measurement noise covariance 'R_'.
  */
 void KalmanFilter::update(const Eigen::VectorXd &z)
 {
